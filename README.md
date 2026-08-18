@@ -29,14 +29,19 @@ The project focuses on:
 ## 📂 Project Structure
 
 ```text
-bank-marketing-data-analysis/
+Bank-Marketing-Analysis/
 │
 ├── Bank_Marketing_Inspection.ipynb
+├── Bank_Marketing_Analysis.pptx
 ├── bankmarketing.csv
 ├── README.md
 ├── requirements.txt
+│
 └── images/
     └── visualizations/
+        ├── Subscription Rate by Education.png
+        ├── Subscription Rate vs No. of Campaign Contacts.png
+        └── Term Deposit Subscription Rate.png
 ```
 
 ## 🔎 Analysis Performed
