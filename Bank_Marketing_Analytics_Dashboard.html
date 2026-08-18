@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank Marketing Analytics Dashboard</title>
+<style>
+  :root{
+    --navy:#1E2761;
+    --navy-dark:#141B4D;
+    --blue:#4A5FA5;
+    --ice:#CADCFC;
+    --ice-tint:#F2F5FC;
+    --gold:#C9A24B;
+    --gold-light:#E4C77D;
+    --ink:#1B1F2A;
+    --mute:#6B7280;
+    --white:#FFFFFF;
+    --green:#3E8E5A;
+    --red:#C0553A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Calibri','Segoe UI',Arial,Helvetica,sans-serif;
+    background:#EEF1F8;
+    margin:0;
+    color:var(--ink);
+  }
+  .header{
+    background:linear-gradient(135deg,var(--navy) 0%, var(--navy-dark) 100%);
+    color:var(--white);
+    padding:38px 48px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  .header::after{
+    content:"";
+    position:absolute;
+    right:-60px; top:-90px;
+    width:280px; height:280px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+  }
+  .header::before{
+    content:"";
+    position:absolute;
+    right:120px; bottom:-120px;
+    width:180px; height:180px;
+    border-radius:50%;
+    background:rgba(201,162,75,0.10);
+  }
+  .header-inner{position:relative; z-index:1; max-width:1400px; margin:0 auto;}
+  .eyebrow{
+    font-size:12px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--gold-light); margin:0 0 10px;
+  }
+  .header h1{
+    margin:0 0 8px; font-family:Cambria,Georgia,serif; font-size:32px; font-weight:700;
+  }
+  .header p{margin:0; color:var(--ice); font-size:15px; max-width:640px; line-height:1.5;}
+
+  .container{padding:30px 48px 50px; max-width:1400px; margin:auto;}
+
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:26px;}
+  .kpi-card{
+    background:var(--white); border-radius:14px; padding:20px 22px;
+    box-shadow:0 3px 14px rgba(30,39,97,0.07);
+    border-top:3px solid var(--navy);
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .kpi-card.accent{border-top-color:var(--gold);}
+  .kpi-icon{
+    width:34px; height:34px; border-radius:9px; background:var(--ice-tint);
+    display:flex; align-items:center; justify-content:center; margin-bottom:8px;
+  }
+  .kpi-icon svg{width:18px; height:18px; stroke:var(--navy);}
+  .kpi-label{font-size:11.5px; color:var(--mute); text-transform:uppercase; letter-spacing:1px; font-weight:700;}
+  .kpi-value{font-size:28px; font-weight:700; color:var(--navy); font-family:Cambria,Georgia,serif;}
+  .kpi-sub{font-size:12px; color:var(--mute);}
+
+  .section-title{
+    font-family:Cambria,Georgia,serif; font-size:19px; font-weight:700; color:var(--navy);
+    margin:34px 0 14px; display:flex; align-items:center; gap:10px;
+  }
+  .section-title .tag{
+    font-family:'Calibri',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px;
+    color:var(--gold); background:var(--navy); padding:3px 9px; border-radius:20px; text-transform:uppercase;
+  }
+
+  .grid2{display:grid; grid-template-columns:1.15fr 0.85fr; gap:20px;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+
+  .chart-card{
+    background:var(--white); border-radius:14px; padding:18px 20px 8px;
+    box-shadow:0 3px 14px rgba(30,39,97,0.07);
+  }
+  .chart-card h3{
+    margin:2px 4px 2px; font-size:14.5px; font-weight:700; color:var(--navy);
+    font-family:Cambria,Georgia,serif;
+  }
+  .chart-card .cap{margin:0 4px 8px; font-size:12px; color:var(--mute);}
+
+  .stat-compare{
+    background:var(--white); border-radius:14px; padding:20px 22px; box-shadow:0 3px 14px rgba(30,39,97,0.07);
+    display:flex; flex-direction:column; justify-content:center; height:100%;
+  }
+  .stat-compare h3{margin:0 0 14px; font-size:14.5px; font-weight:700; color:var(--navy); font-family:Cambria,Georgia,serif;}
+  .compare-row{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .compare-label{width:82px; font-size:12.5px; color:var(--mute); font-weight:600;}
+  .compare-bar-wrap{flex:1; background:var(--ice-tint); border-radius:6px; height:22px; position:relative; overflow:hidden;}
+  .compare-bar{height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px;}
+  .compare-bar span{color:var(--white); font-size:11.5px; font-weight:700;}
+  .compare-note{font-size:12px; color:var(--mute); margin-top:2px; line-height:1.5;}
+  .compare-note b{color:var(--navy);}
+
+  .insights{
+    background:var(--navy); border-radius:16px; padding:30px 34px; margin-top:36px; color:var(--white);
+    position:relative; overflow:hidden;
+  }
+  .insights::after{
+    content:""; position:absolute; left:-70px; bottom:-90px; width:220px; height:220px;
+    border-radius:50%; background:rgba(255,255,255,0.04);
+  }
+  .insights-inner{position:relative; z-index:1;}
+  .insights h2{margin:0 0 4px; font-family:Cambria,Georgia,serif; font-size:20px;}
+  .insights p.lead{margin:0 0 20px; color:var(--ice); font-size:13.5px; max-width:700px;}
+  .insight-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .insight-item{
+    background:rgba(255,255,255,0.06); border-radius:12px; padding:16px 18px;
+    border-left:3px solid var(--gold);
+  }
+  .insight-item .num{font-family:Cambria,Georgia,serif; font-size:22px; font-weight:700; color:var(--gold-light); margin-bottom:4px;}
+  .insight-item .txt{font-size:12.5px; line-height:1.5; color:var(--ice);}
+
+  .footer{text-align:center; color:var(--mute); font-size:11.5px; padding:26px;}
+
+  /* --- custom SVG chart styling --- */
+  .viz{width:100%; position:relative;}
+  .viz svg{width:100%; height:100%; display:block; overflow:visible;}
+  .bar-rect{transition:opacity .15s;}
+  .bar-rect:hover{opacity:0.82; cursor:pointer;}
+  .axis-line{stroke:#E3E8F4; stroke-width:1;}
+  .grid-line{stroke:#EEF1F8; stroke-width:1;}
+  .tick-label{font-size:11px; fill:var(--mute); font-family:'Calibri',sans-serif;}
+  .cat-label{font-size:11.5px; fill:var(--ink); font-family:'Calibri',sans-serif;}
+  .val-label{font-size:11.5px; fill:var(--navy); font-weight:700; font-family:'Calibri',sans-serif;}
+  .val-label.on-bar{fill:#fff;}
+  .axis-title{font-size:11.5px; fill:var(--mute); font-family:'Calibri',sans-serif; font-weight:600;}
+  .chart-tooltip{
+    position:absolute; pointer-events:none; background:var(--navy); color:#fff;
+    font-size:12px; padding:6px 10px; border-radius:7px; white-space:nowrap;
+    transform:translate(-50%,-115%); opacity:0; transition:opacity .1s; z-index:5;
+    box-shadow:0 4px 12px rgba(0,0,0,0.18);
+  }
+  .chart-tooltip b{color:var(--gold-light);}
+  .line-path{fill:none; stroke:var(--navy); stroke-width:2.5;}
+  .area-path{fill:url(#areaGrad); opacity:0.5;}
+  .line-dot{fill:var(--gold); stroke:#fff; stroke-width:1.5; transition:r .1s;}
+  .line-dot:hover{r:6; cursor:pointer;}
+  .donut-slice{transition:opacity .15s;}
+  .donut-slice:hover{opacity:0.85; cursor:pointer;}
+
+  @media(max-width:1000px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .grid2, .grid3{grid-template-columns:1fr;}
+    .insight-grid{grid-template-columns:1fr;}
+    .header, .container{padding-left:22px; padding-right:22px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">Bank Marketing Analytics</p>
+    <h1>Term Deposit Campaign Performance</h1>
+    <p>Customer segmentation, contact-channel effectiveness, and subscription drivers across 41,188 campaign contacts.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="kpis">
+    <div class="kpi-card">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="kpi-label">Total Customers</div>
+      <div class="kpi-value">41,188</div>
+      <div class="kpi-sub">Contacts in the campaign dataset</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div class="kpi-label">Subscriptions</div>
+      <div class="kpi-value">4,640</div>
+      <div class="kpi-sub">Customers who opened a term deposit</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8.3l-5.2 5.2-3-3-3.5 3.5"/></svg></div>
+      <div class="kpi-label">Subscription Rate</div>
+      <div class="kpi-value">11.27%</div>
+      <div class="kpi-sub">Overall conversion across the base</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+      <div class="kpi-label">Avg. Call Duration</div>
+      <div class="kpi-value">258.3<span style="font-size:15px;">s</span></div>
+      <div class="kpi-sub">Average length of the last contact</div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="tag">Who Subscribes</span> Customer Segments</div>
+  <div class="grid2">
+    <div class="chart-card">
+      <h3>Subscription Rate by Age Group</h3>
+      <p class="cap">Older and younger customers convert far more often than the working-age middle.</p>
+      <div id="chart-age" style="height:300px;"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Subscription Outcome</h3>
+      <p class="cap">Share of all contacts that resulted in a subscription.</p>
+      <div id="chart-pie" style="height:300px;"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px;">
+    <div class="chart-card">
+      <h3>Top Job Categories by Subscription Rate</h3>
+      <p class="cap">Students and retirees convert at 2–3x the rate of most working professions.</p>
+      <div id="chart-job" style="height:340px;"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Subscription Rate by Education</h3>
+      <p class="cap">Higher education levels trend toward higher conversion.</p>
+      <div id="chart-education" style="height:340px;"></div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="tag">Campaign Effectiveness</span> Contact Strategy</div>
+  <div class="grid3">
+    <div class="stat-compare">
+      <h3>Contact Method</h3>
+      <div class="compare-row">
+        <div class="compare-label">Cellular</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:100%; background:var(--navy);"><span>14.7%</span></div></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">Telephone</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:35.5%; background:var(--blue);"><span>5.2%</span></div></div>
+      </div>
+      <div class="compare-note">Mobile outreach converts <b>~2.8x</b> better than landline calls.</div>
+    </div>
+    <div class="chart-card" style="grid-column: span 2;">
+      <h3>Subscription Rate vs. Number of Campaign Contacts</h3>
+      <p class="cap">Conversion drops sharply after the first couple of touches &mdash; repeated contact shows diminishing (and eventually negative) returns.</p>
+      <div id="chart-contacts" style="height:260px;"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px;">
+    <div class="chart-card">
+      <h3>Subscription Rate by Previous Campaign Outcome</h3>
+      <p class="cap">A prior successful contact is the single strongest predictor of a new subscription.</p>
+      <div id="chart-prev" style="height:300px;"></div>
+    </div>
+    <div class="stat-compare">
+      <h3>Previous Outcome, at a Glance</h3>
+      <div class="compare-row">
+        <div class="compare-label">Success</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:100%; background:var(--navy);"><span>65.1%</span></div></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">Failure</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:21.9%; background:var(--blue);"><span>14.2%</span></div></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">No prior contact</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:13.6%; background:#8CA0D6;"><span>8.8%</span></div></div>
+      </div>
+      <div class="compare-note">Customers with a prior successful campaign subscribe at <b>~7.4x</b> the rate of those never contacted before.</div>
+    </div>
+  </div>
+
+  <div class="insights">
+    <div class="insights-inner">
+      <h2>Key Takeaways</h2>
+      <p class="lead">Patterns worth acting on when planning the next campaign wave.</p>
+      <div class="insight-grid">
+        <div class="insight-item">
+          <div class="num">65+ &amp; 18&ndash;25</div>
+          <div class="txt">The two age extremes convert best (46.8% and 20.9%), while the 36&ndash;55 working-age bracket lags at 8&ndash;9%.</div>
+        </div>
+        <div class="insight-item">
+          <div class="num">Students &amp; Retirees</div>
+          <div class="txt">These two job categories lead conversion at 31.4% and 25.2% &mdash; both well above the 11.3% overall average.</div>
+        </div>
+        <div class="insight-item">
+          <div class="num">Cellular &gt; Telephone</div>
+          <div class="txt">Mobile contact converts at 14.7% vs. 5.2% for landline &mdash; channel choice alone nearly triples response.</div>
+        </div>
+        <div class="insight-item">
+          <div class="num">Fewer Touches Win</div>
+          <div class="txt">Rate falls from 13.0% on the first contact to under 5% by the 8th &mdash; over-contacting erodes response.</div>
+        </div>
+        <div class="insight-item">
+          <div class="num">Prior Success = 65%</div>
+          <div class="txt">A previously successful campaign outcome predicts a 65.1% re-subscription rate, by far the strongest signal available.</div>
+        </div>
+        <div class="insight-item">
+          <div class="num">Education Trend</div>
+          <div class="txt">Subscription rate rises with education, from 7.8% (basic 9y) to 13.7% (university degree).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Bank Marketing Data Analysis &middot; Internship Project</div>
+
+<script>
+const NAVY = '#1E2761', BLUE = '#4A5FA5', GOLD = '#C9A24B', ICE = '#CADCFC', MUTE = '#6B7280';
+const NS = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+function makeTooltip(container) {
+  const tip = document.createElement('div');
+  tip.className = 'chart-tooltip';
+  container.appendChild(tip);
+  return tip;
+}
+function showTip(tip, container, evt, html) {
+  const rect = container.getBoundingClientRect();
+  tip.innerHTML = html;
+  tip.style.left = (evt.clientX - rect.left) + 'px';
+  tip.style.top = (evt.clientY - rect.top) + 'px';
+  tip.style.opacity = 1;
+}
+function hideTip(tip) { tip.style.opacity = 0; }
+
+/* ---------- Vertical bar chart ---------- */
+function verticalBarChart(id, categories, values, opts = {}) {
+  const container = document.getElementById(id);
+  const W = container.clientWidth || 500, H = container.clientHeight || 280;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}` });
+  const marginL = 44, marginR = 14, marginT = 26, marginB = 40;
+  const plotW = W - marginL - marginR, plotH = H - marginT - marginB;
+  const maxV = opts.maxV || Math.max(...values) * 1.22;
+  const bw = plotW / values.length;
+  const barW = bw * (opts.barWidthRatio || 0.52);
+
+  // gridlines
+  const gridN = 4;
+  for (let i = 0; i <= gridN; i++) {
+    const y = marginT + plotH - (plotH * i / gridN);
+    svg.appendChild(el('line', { x1: marginL, x2: marginL + plotW, y1: y, y2: y, class: 'grid-line' }));
+    const t = el('text', { x: marginL - 8, y: y + 4, class: 'tick-label', 'text-anchor': 'end' });
+    t.textContent = Math.round(maxV * i / gridN) + '%';
+    svg.appendChild(t);
+  }
+  svg.appendChild(el('line', { x1: marginL, x2: marginL, y1: marginT, y2: marginT + plotH, class: 'axis-line' }));
+  svg.appendChild(el('line', { x1: marginL, x2: marginL + plotW, y1: marginT + plotH, y2: marginT + plotH, class: 'axis-line' }));
+
+  const tip = makeTooltip(container);
+
+  values.forEach((v, i) => {
+    const x = marginL + bw * i + (bw - barW) / 2;
+    const barH = (v / maxV) * plotH;
+    const y = marginT + plotH - barH;
+    const color = (opts.colorFn ? opts.colorFn(v, i) : NAVY);
+    const rect = el('rect', { x, y, width: barW, height: barH, rx: 4, fill: color, class: 'bar-rect' });
+    rect.addEventListener('mousemove', e => showTip(tip, container, e, `<b>${categories[i]}</b>: ${v.toFixed(1)}%`));
+    rect.addEventListener('mouseleave', () => hideTip(tip));
+    svg.appendChild(rect);
+
+    const vt = el('text', { x: x + barW / 2, y: y - 6, class: 'val-label', 'text-anchor': 'middle' });
+    vt.textContent = v.toFixed(1) + '%';
+    svg.appendChild(vt);
+
+    const ct = el('text', { x: x + barW / 2, y: marginT + plotH + 18, class: 'cat-label', 'text-anchor': 'middle' });
+    ct.textContent = categories[i];
+    svg.appendChild(ct);
+  });
+
+  container.appendChild(svg);
+}
+
+/* ---------- Horizontal bar chart ---------- */
+function horizontalBarChart(id, categories, values, opts = {}) {
+  const container = document.getElementById(id);
+  const W = container.clientWidth || 500, H = container.clientHeight || 320;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}` });
+  const marginL = opts.marginL || 118, marginR = 46, marginT = 6, marginB = 6;
+  const plotW = W - marginL - marginR, plotH = H - marginT - marginB;
+  const maxV = opts.maxV || Math.max(...values) * 1.2;
+  const bh = plotH / values.length;
+  const barH = bh * 0.55;
+
+  const tip = makeTooltip(container);
+
+  values.forEach((v, i) => {
+    const y = marginT + bh * i + (bh - barH) / 2;
+    const barW = (v / maxV) * plotW;
+    const color = (opts.colorFn ? opts.colorFn(v, i) : BLUE);
+    const rect = el('rect', { x: marginL, y, width: barW, height: barH, rx: 4, fill: color, class: 'bar-rect' });
+    rect.addEventListener('mousemove', e => showTip(tip, container, e, `<b>${categories[i]}</b>: ${v.toFixed(1)}%`));
+    rect.addEventListener('mouseleave', () => hideTip(tip));
+    svg.appendChild(rect);
+
+    const ct = el('text', { x: marginL - 8, y: y + barH / 2 + 4, class: 'cat-label', 'text-anchor': 'end' });
+    ct.textContent = categories[i];
+    svg.appendChild(ct);
+
+    const vt = el('text', { x: marginL + barW + 8, y: y + barH / 2 + 4, class: 'val-label' });
+    vt.textContent = v.toFixed(1) + '%';
+    svg.appendChild(vt);
+  });
+
+  container.appendChild(svg);
+}
+
+/* ---------- Line chart ---------- */
+function lineChart(id, xVals, yVals, opts = {}) {
+  const container = document.getElementById(id);
+  const W = container.clientWidth || 500, H = container.clientHeight || 240;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}` });
+  const marginL = 44, marginR = 16, marginT = 20, marginB = 34;
+  const plotW = W - marginL - marginR, plotH = H - marginT - marginB;
+  const maxV = Math.max(...yVals) * 1.15;
+  const minX = Math.min(...xVals), maxX = Math.max(...xVals);
+
+  const defs = el('defs', {});
+  const grad = el('linearGradient', { id: 'areaGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.appendChild(el('stop', { offset: '0%', 'stop-color': NAVY, 'stop-opacity': 0.28 }));
+  grad.appendChild(el('stop', { offset: '100%', 'stop-color': NAVY, 'stop-opacity': 0 }));
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const gridN = 4;
+  for (let i = 0; i <= gridN; i++) {
+    const y = marginT + plotH - (plotH * i / gridN);
+    svg.appendChild(el('line', { x1: marginL, x2: marginL + plotW, y1: y, y2: y, class: 'grid-line' }));
+    const t = el('text', { x: marginL - 8, y: y + 4, class: 'tick-label', 'text-anchor': 'end' });
+    t.textContent = Math.round(maxV * i / gridN) + '%';
+    svg.appendChild(t);
+  }
+  svg.appendChild(el('line', { x1: marginL, x2: marginL, y1: marginT, y2: marginT + plotH, class: 'axis-line' }));
+  svg.appendChild(el('line', { x1: marginL, x2: marginL + plotW, y1: marginT + plotH, y2: marginT + plotH, class: 'axis-line' }));
+
+  const px = x => marginL + ((x - minX) / (maxX - minX)) * plotW;
+  const py = y => marginT + plotH - (y / maxV) * plotH;
+
+  let d = `M ${px(xVals[0])} ${py(yVals[0])}`;
+  let areaD = `M ${px(xVals[0])} ${marginT + plotH} L ${px(xVals[0])} ${py(yVals[0])}`;
+  for (let i = 1; i < xVals.length; i++) {
+    d += ` L ${px(xVals[i])} ${py(yVals[i])}`;
+    areaD += ` L ${px(xVals[i])} ${py(yVals[i])}`;
+  }
+  areaD += ` L ${px(xVals[xVals.length - 1])} ${marginT + plotH} Z`;
+
+  svg.appendChild(el('path', { d: areaD, class: 'area-path' }));
+  svg.appendChild(el('path', { d, class: 'line-path' }));
+
+  const tip = makeTooltip(container);
+  xVals.forEach((xv, i) => {
+    const cx = px(xv), cy = py(yVals[i]);
+    const dot = el('circle', { cx, cy, r: 3.6, class: 'line-dot' });
+    dot.addEventListener('mousemove', e => showTip(tip, container, e, `Contact #<b>${xv}</b>: ${yVals[i].toFixed(1)}%`));
+    dot.addEventListener('mouseleave', () => hideTip(tip));
+    svg.appendChild(dot);
+    if (xv % 2 === 1 || xv === maxX) {
+      const t = el('text', { x: cx, y: marginT + plotH + 18, class: 'tick-label', 'text-anchor': 'middle' });
+      t.textContent = xv;
+      svg.appendChild(t);
+    }
+  });
+
+  const xAxisTitle = el('text', { x: marginL + plotW / 2, y: H - 2, class: 'axis-title', 'text-anchor': 'middle' });
+  xAxisTitle.textContent = 'Number of Contacts';
+  svg.appendChild(xAxisTitle);
+
+  container.appendChild(svg);
+}
+
+/* ---------- Donut chart ---------- */
+function donutChart(id, labels, values, colors, centerLabel) {
+  const container = document.getElementById(id);
+  const W = container.clientWidth || 300, H = container.clientHeight || 280;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}` });
+  const cx = W / 2, cy = (H - 34) / 2, rOuter = Math.min(W, H - 34) / 2 - 6, rInner = rOuter * 0.62;
+  const total = values.reduce((a, b) => a + b, 0);
+  let angle = -Math.PI / 2;
+  const tip = makeTooltip(container);
+
+  values.forEach((v, i) => {
+    const frac = v / total;
+    const a0 = angle, a1 = angle + frac * 2 * Math.PI;
+    angle = a1;
+    const large = (a1 - a0) > Math.PI ? 1 : 0;
+    const x0o = cx + rOuter * Math.cos(a0), y0o = cy + rOuter * Math.sin(a0);
+    const x1o = cx + rOuter * Math.cos(a1), y1o = cy + rOuter * Math.sin(a1);
+    const x0i = cx + rInner * Math.cos(a1), y0i = cy + rInner * Math.sin(a1);
+    const x1i = cx + rInner * Math.cos(a0), y1i = cy + rInner * Math.sin(a0);
+    const d = `M ${x0o} ${y0o} A ${rOuter} ${rOuter} 0 ${large} 1 ${x1o} ${y1o} L ${x0i} ${y0i} A ${rInner} ${rInner} 0 ${large} 0 ${x1i} ${y1i} Z`;
+    const path = el('path', { d, fill: colors[i], class: 'donut-slice' });
+    path.addEventListener('mousemove', e => showTip(tip, container, e, `<b>${labels[i]}</b>: ${v.toLocaleString()} (${(frac * 100).toFixed(1)}%)`));
+    path.addEventListener('mouseleave', () => hideTip(tip));
+    svg.appendChild(path);
+  });
+
+  const centerT1 = el('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', class: 'val-label' });
+  centerT1.setAttribute('style', 'font-size:19px; font-family:Cambria,Georgia,serif;');
+  centerT1.textContent = centerLabel;
+  svg.appendChild(centerT1);
+  const centerT2 = el('text', { x: cx, y: cy + 14, 'text-anchor': 'middle', class: 'tick-label' });
+  centerT2.textContent = 'subscribed';
+  svg.appendChild(centerT2);
+
+  container.appendChild(svg);
+
+  // legend
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex; justify-content:center; gap:18px; margin-top:2px; font-size:12px; color:#1B1F2A;';
+  labels.forEach((l, i) => {
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex; align-items:center; gap:6px;';
+    item.innerHTML = `<span style="width:10px;height:10px;border-radius:3px;background:${colors[i]};display:inline-block;"></span>${l}`;
+    legend.appendChild(item);
+  });
+  container.appendChild(legend);
+}
+
+/* ---------- Render all charts ---------- */
+verticalBarChart('chart-age',
+  ['65+','18-25','56-65','26-35','46-55','36-45'],
+  [46.85, 20.95, 15.22, 11.72, 8.69, 8.51]
+);
+
+donutChart('chart-pie', ['No', 'Yes'], [36548, 4640], [ICE, GOLD], '11.27%');
+
+horizontalBarChart('chart-job',
+  ['entrepreneur','housemaid','self-employed','technician','unknown','management','admin.','unemployed','retired','student'],
+  [8.52,10.0,10.49,10.83,11.21,11.22,12.97,14.20,25.23,31.43],
+  { colorFn: v => v >= 20 ? GOLD : BLUE }
+);
+
+horizontalBarChart('chart-education',
+  ['basic.9y','basic.6y','basic.4y','high.school','professional.course','university.degree','unknown','illiterate'],
+  [7.82,8.20,10.25,10.84,11.35,13.72,14.50,22.22],
+  { marginL: 150 }
+);
+
+lineChart('chart-contacts',
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+  [13.04,11.46,10.75,9.39,7.50,7.66,6.04,4.25,6.01,5.33,6.78,2.40,4.35,1.45,3.92]
+);
+
+verticalBarChart('chart-prev',
+  ['nonexistent','failure','success'],
+  [8.83,14.23,65.11],
+  { colorFn: (v, i) => ['#9FB6E8', BLUE, GOLD][i], barWidthRatio: 0.4, maxV: 78 }
+);
+</script>
+
+</body>
+</html>
