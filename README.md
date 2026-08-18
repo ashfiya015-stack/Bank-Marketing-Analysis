@@ -6,6 +6,17 @@ An exploratory data analysis and customer segmentation project using bank market
 
 The primary objective of this project is to analyze customer and marketing campaign data and identify factors associated with whether a customer subscribes to a term deposit.
 
+
+## 📌 Key Highlights
+
+- Performed exploratory data analysis on bank marketing data
+- Analyzed customer demographics and financial characteristics
+- Studied marketing campaign effectiveness
+- Examined term-deposit subscription patterns
+- Performed customer segmentation
+- Created visualizations to communicate business insights
+
+  
 The project focuses on:
 
 * 👥 Customer demographics and behavior
